@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  color: #333;
+  background-color: #55efc4;
+}
+
+main > section {
+  margin: 20px 0;
+}
+
+#your_character {
+  .character-inputs {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    > * {
+      flex-grow: 1;
+    }
+  }
+
+  input {
+    padding: 6px 12px;
+    font-size: 1.2rem;
+  }
+
+  button {
+    padding: 8px 24px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background-color: #00b894;
+    color: #333;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+  }
+}
+
+#battle {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+
+  > * {
+    width: calc(100% / 3);
+    padding: 12px;
+  }
+
+  .player {
+    border: 1px solid black;
+
+    .list {
+      margin-top: 10px;
+      list-style: none;
+
+      li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      li > img {
+        width: 30px;
+        margin-right: 6px;
+      }
+
+      li > span.stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .log {
+    border: 1px solid black;
+  }
+
+  .enemy {
+    border: 1px solid black;
+  }
+}

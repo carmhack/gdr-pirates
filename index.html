@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle of Pirates</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Battle of Pirates</h1>
+    </header>
+
+    <main>
+      <section id="your_character">
+        <h2>Create your pirate</h2>
+        <div class="character-inputs">
+          <input type="text" id="createPirateName" value="Adriano" placeholder="Name">
+          <input type="text" id="createPirateDesc" value="Best pirate in town" placeholder="Short description">
+          <button type="button" id="createPirateButton">Create pirate</button>
+        </div>
+      </section>
+
+      <section id="battle">
+        <div class="player">
+          <p class="player-name">Adriano</p>
+          <p class="player-role">Best pirate in town</p>
+
+          <ul class="player-stats list">
+            <li><img src="assets/heart.png" alt="Health"><span class="stat-value">100</span></li>
+            <li><img src="assets/swords.png" alt="Attack"><span class="stat-value">100</span></li>
+            <li><img src="assets/shield.png" alt="Defense"><span class="stat-value">100</span></li>
+            <li><img src="assets/bag.png" alt="Gold"><span class="stat-value">100</span></li>
+          </ul>
+          <hr>
+          <ul class="inventory list">
+            <li><img src="assets/ring.png" alt="Ring"><span>Ring</span></li>
+            <li><img src="assets/potion.png" alt="Potion"><span>Potion</span></li>
+          </ul>
+        </div>
+        <div class="log">Log</div>
+        <div class="enemy">Enemy</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
