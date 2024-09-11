@@ -24,7 +24,7 @@ main > section {
   margin: 20px 0;
 }
 
-#your_character {
+#your-character {
   .character-inputs {
     margin-top: 8px;
     display: flex;
@@ -36,7 +36,7 @@ main > section {
     }
   }
 
-  input {
+  input, select {
     padding: 6px 12px;
     font-size: 1.2rem;
   }
@@ -51,10 +51,43 @@ main > section {
     border: 0;
     cursor: pointer;
   }
+
+  #character-class-description {
+    margin: 20px 0;
+    font-size: 1.2rem;
+  }
+
+  #create-character-stats {
+    display: flex;
+
+    .character-stat {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 12px 6px;
+
+      img {
+        width: 50px;
+        border-radius: 50%;
+      }
+      
+      .stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .stat-name {
+        font-weight: 300;
+        font-style: italic;
+      }
+    }
+    
+  }
 }
 
 #battle {
-  display: flex;
+  display: none;
   justify-content: space-between;
   gap: 6px;
 
@@ -63,36 +96,93 @@ main > section {
     padding: 12px;
   }
 
-  .player {
-    border: 1px solid black;
+  .character-name {
+    font-size: 2rem;
+    font-weight: 700;
+  }
 
-    .list {
-      margin-top: 10px;
-      list-style: none;
+  .list {
+    margin-top: 10px;
+    list-style: none;
 
-      li {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
+    li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+
+      * {
+        margin: 0 6px;
       }
 
-      li > img {
-        width: 30px;
+      img {
+        width: 60px;
+        border-radius: 50%;
         margin-right: 6px;
       }
 
-      li > span.stat-value {
-        font-size: 1.2rem;
+      span.stat-value {
+        font-size: 2rem;
         font-weight: 700;
+      }
+
+      span.stat-name {
+        margin-left: 10px;
+        font-size: 1.2rem;
+        font-weight: 300;
       }
     }
   }
 
-  .log {
-    border: 1px solid black;
+  .inventory {
+    padding: 12px;
+    border: 1px dashed #333;
   }
 
-  .enemy {
-    border: 1px solid black;
+  .commands > button {
+    padding: 12px 24px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background-color: #d63031;
+    color: #fff;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .level {
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .commands {
+      margin: 20px 0;
+    }
+
+    .log {
+      margin: 20px;
+      font-size: 1.2rem;
+      font-weight: 300;
+      line-height: 2rem;
+    }
+  }
+
+  .player {
+    text-align: right;
+
+    #player-stats li, #player-inventory li {
+      justify-content: flex-start;
+      flex-direction: row-reverse;
+
+      * {
+        margin: 0 6px;
+      }
+    }
   }
 }
