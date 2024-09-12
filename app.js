@@ -7,6 +7,25 @@ const STAT_IMG_PATH = {
   health: "health.webp",
 }
 
+const ITEMS = [
+  // Armi
+  { name: "Sciabola di Ferro", type: "weapon", bonus: { strength: 4 }, cost: 30 },
+  { name: "Pistola a Pietra Focaia", type: "weapon", bonus: { strength: 6 }, cost: 50 },
+  { name: "Alabarda da Battaglia", type: "weapon", bonus: { strength: 8 }, cost: 80 },
+  { name: "Coltello da Lancio", type: "weapon", bonus: { strength: 3, dexterity: 2 }, cost: 25 },
+  { name: "Spada del Capitano", type: "weapon", bonus: { strength: 10 }, cost: 100 },
+  // Armature
+  { name: "Gilet di Cuoio", type: "armor", bonus: { endurance: 2 }, cost: 20 },
+  { name: "Giubbotto Imbottito", type: "armor", bonus: { endurance: 3 }, cost: 35 },
+  { name: "Corazza di Ferro", type: "armor", bonus: { endurance: 5 }, cost: 50 },
+  { name: "Giacca del Capitano", type: "armor", bonus: { endurance: 6 }, cost: 80 },
+  { name: "Armatura Completa", type: "armor", bonus: { endurance: 8 }, cost: 100 },
+  // Pozioni
+  { name: "Pozione Curativa", type: "health", bonus: { health: 30 }, cost: 15 },
+  { name: "Pozione di Forza", type: "health", bonus: { strength: 5, duration: 3 }, cost: 20 },
+  { name: "Pozione di Resistenza", type: "health", bonus: { endurance: 5, duration: 3 }, cost: 20 }
+]
+
 const pirateClasses = [
   {
     className: "Corsaro",
@@ -83,13 +102,13 @@ const pirateClasses = [
 const player = {
   name: "Adriano",
   className: "Corsaro", // Classe del pirata, es. "Capitano", "Artigliere", ecc.
-  gold: 0,  // Quantità di oro posseduta dal pirata
   stats: {
     strength: 14,      // Forza fisica per attacchi corpo a corpo
     dexterity: 12,     // Abilità e velocità nei movimenti
     endurance: 10,     // Resistenza fisica e capacità di sopportare danni
     luck: 8,           // Fortuna, può influire su eventi casuali o colpi critici
     health: 100,       // Punti salute
+    gold: 0,           // Quantità di oro posseduta dal pirata
   },
   equipment: {
     weapon: "Pistola Mezza Rotta",  // Arma attuale del pirata
@@ -103,13 +122,13 @@ const player = {
     return baseHitChance + dexterityBonus - evasion;
   },
   attack(target) {
-    console.log(`${this.name} attacca ${target.name}`);
+    renderBattleLog(`${this.name} attacca ${target.name}`);
     const hitChance = this.calculateHitChance(target);
     const hitRoll = Math.random() * 100;  // Tira un numero tra 0 e 100
 
     if (hitRoll < hitChance) {
       // Colpo riuscito
-      const baseDamage = this.stats.strength;  // Danno basato sulla forza
+      let baseDamage = this.stats.strength;  // Danno basato sulla forza
       const weaponBonus = this.getWeaponBonus();
       const criticalChance = this.stats.luck;  // Usa la fortuna per determinare i critici
       const criticalRoll = Math.random() * 100;
@@ -122,9 +141,9 @@ const player = {
       const totalDamage = baseDamage + weaponBonus;
       // Applica danno al bersaglio
       target.takeDamage(totalDamage);
-      console.log(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
+      renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
     } else {
-      console.log(`${this.name} ha mancato l'attacco!`);
+      renderBattleLog(`${this.name} ha mancato l'attacco!`);
     }
   },
   takeDamage(damage) {
@@ -139,6 +158,7 @@ const player = {
     const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
     
     this.stats.health -= Math.max(reducedDamage, 0);
+    console.log("reduced", reducedDamage, this.stats.health);
 
     if (this.stats.health < 0) this.stats.health = 0;
   },
@@ -155,13 +175,13 @@ const enemies = [
   {
     name: "Pirata Principiante",
     className: "Corsaro",
-    gold: 50,
     stats: {
       strength: 5,
       dexterity: 5,
       endurance: 5,
       luck: 5,
       health: 50,
+      gold: 50,
     },
     equipment: {
       weapon: "Pugnale",
@@ -175,7 +195,7 @@ const enemies = [
       return baseHitChance + dexterityBonus - evasion;
     },
     attack(target) {
-      console.log(`${this.name} attacca ${target.name}`);
+      renderBattleLog(`${this.name} attacca ${target.name}`);
       const hitChance = this.calculateHitChance(target);
       const hitRoll = Math.random() * 100;
   
@@ -193,9 +213,9 @@ const enemies = [
         const totalDamage = baseDamage + weaponBonus;
         target.takeDamage(totalDamage);
 
-        console.log(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
+        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
       } else {
-        console.log(`${this.name} ha mancato l'attacco!`);
+        renderBattleLog(`${this.name} ha mancato l'attacco!`);
       }
     },
     takeDamage(damage) {
@@ -219,13 +239,13 @@ const enemies = [
   {
     name: "Pirata Esperto",
     className: "Assassino del Porto",
-    gold: 150,
     stats: {
       strength: 10,
       dexterity: 12,
       endurance: 10,
       luck: 8,
       health: 100,
+      gold: 150,
     },
     equipment: {
       weapon: "Sciabola",
@@ -239,6 +259,7 @@ const enemies = [
       return baseHitChance + dexterityBonus - evasion;
     },
     attack(target) {
+      renderBattleLog(`${this.name} attacca ${target.name}`);
       const hitChance = this.calculateHitChance(target);
       const hitRoll = Math.random() * 100;
   
@@ -252,10 +273,13 @@ const enemies = [
         if (criticalRoll < criticalChance) {
           baseDamage *= 2;
         }
-        
-        target.takeDamage(baseDamage + weaponBonus);
+
+        const totalDamage = baseDamage + weaponBonus;
+        target.takeDamage(totalDamage);
+
+        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
       } else {
-        console.log(`${this.name} ha mancato l'attacco!`);
+        renderBattleLog(`${this.name} ha mancato l'attacco!`);
       }
     },
     takeDamage(damage) {
@@ -268,9 +292,9 @@ const enemies = [
       const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
       const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
       
-      this.health -= Math.max(reducedDamage, 0);
+      this.stats.health -= Math.max(reducedDamage, 0);
   
-      if (this.health < 0) this.health = 0;
+      if (this.stats.health < 0) this.stats.health = 0;
     },
     getWeaponBonus() {
       return 3;
@@ -279,13 +303,13 @@ const enemies = [
   {
     name: "Pirata Veterano",
     className: "Mastro d'Armi",
-    gold: 300,
     stats: {
       strength: 15,
       dexterity: 14,
       endurance: 12,
       luck: 12,
       health: 100,
+      gold: 300,
     },
     equipment: {
       weapon: "Alabarda",
@@ -299,6 +323,7 @@ const enemies = [
       return baseHitChance + dexterityBonus - evasion;
     },
     attack(target) {
+      renderBattleLog(`${this.name} attacca ${target.name}`);
       const hitChance = this.calculateHitChance(target);
       const hitRoll = Math.random() * 100;
   
@@ -312,10 +337,13 @@ const enemies = [
         if (criticalRoll < criticalChance) {
           baseDamage *= 2;
         }
-        
-        target.takeDamage(baseDamage + weaponBonus);
+
+        const totalDamage = baseDamage + weaponBonus;
+        target.takeDamage(totalDamage);
+
+        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
       } else {
-        console.log(`${this.name} ha mancato l'attacco!`);
+        renderBattleLog(`${this.name} ha mancato l'attacco!`);
       }
     },
     takeDamage(damage) {
@@ -328,9 +356,9 @@ const enemies = [
       const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
       const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
       
-      this.health -= Math.max(reducedDamage, 0);
+      this.stats.health -= Math.max(reducedDamage, 0);
   
-      if (this.health < 0) this.health = 0;
+      if (this.stats.health < 0) this.stats.health = 0;
     },
     getWeaponBonus() {
       return 5;
@@ -340,43 +368,38 @@ const enemies = [
 let currentLevel = 0;
 
 function combat() {
+  emptyBattleLog();
   const enemy = enemies[currentLevel];
   player.attack(enemy);
   enemy.attack(player);
 
-  /*
-  let battleLog = `${player.name} attacca ${enemy.name}!\n`;
-
-  // Calcolo del danno inflitto
-  const playerDamage = Math.max(0, player.stats.attack - enemy.stats.defense);
-  const enemyDamage = Math.max(0, enemy.stats.attack - player.stats.defense);
-
-  // Applicare il danno
-  enemy.stats.health -= playerDamage;
-  player.stats.health -= enemyDamage;
-
-  battleLog += `${player.name} infligge ${playerDamage} danni a ${enemy.name}.\n`;
-  battleLog += `${enemy.name} ha ora ${enemy.stats.health} salute rimanente.\n`;
-  battleLog += `${player.name} ha ora ${player.stats.health} salute rimanente.\n`;
-
   if (enemy.stats.health <= 0) {
-    battleLog += `${enemy.name} è stato sconfitto!\n`;
-    // Ho vinto
     player.stats.gold += enemy.stats.gold;
+    player.stats.strength += 2;
+    player.stats.dexterity += 2;
+    player.stats.endurance += 2;
+    player.stats.luck += 2;
+    player.stats.health += 20;
     currentLevel++;
-    updateUI(player);
-  } else if (player.stats.health <= 0) {
-    // Ho perso
-    battleLog += `${player.name} è stato sconfitto!\n`;
   }
 
-  return battleLog;
-  */
+  updateUI();
+}
+
+function emptyBattleLog() {
+  document.querySelector("#battle-log").innerHTML = "";
 }
 
 function renderBattleLog(text) {
-  console.log(text);
-  document.querySelector("#battle-log").innerHTML += `<p>${text}</p>`;
+  const newLog = document.createElement("li");
+  newLog.textContent = text;
+
+  const ul = document.querySelector("#battle-log");
+  ul.appendChild(newLog);
+
+  setTimeout(() => {
+    newLog.classList.add("fade-in");
+  }, 10);
 }
 
 function renderStats(character, tagId) {
@@ -405,14 +428,34 @@ function renderPlayer() {
 
 function renderEnemy() {
   const enemy = enemies[currentLevel];
+  document.querySelector("#level").innerText = `Level ${currentLevel+1}`;
   document.querySelector("#enemy-name").innerText = enemy.name;
   renderStats(enemy, "#enemy-stats");
   renderInventory(enemy, "#enemy-inventory");
 }
 
+function renderInventory() {
+  document.querySelector("#inventory").innerHTML = "";
+  ITEMS.forEach(({ name, type, bonus, cost }) => {
+    let bonusText = "";
+    Object.keys(bonus).forEach(effect => {
+      bonusText += `${effect}: +${bonus[effect]}\n`;
+    })
+    document.querySelector("#inventory").innerHTML += `
+      <div class="item">
+        <img src="assets/${type}.webp" />
+        <p class="item-cost">$${cost}</p>
+        <p class="item-name">${name}</p>
+        <p class="item-effect">${bonusText}</p>
+      </div>
+    `;
+  });
+}
+
 function updateUI() {
   renderPlayer();
   renderEnemy();
+  renderInventory();
 }
 
 function startGame() {
@@ -469,8 +512,7 @@ window.addEventListener("load", function() {
 
   // Gestione pulsante attacco
   document.querySelector("#attack-button").addEventListener("click", function() {
-    const log = combat();
-    document.querySelector("#battle-log").innerText = log;
+    combat();
   })
 
   startGame();
