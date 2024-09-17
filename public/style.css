@@ -49,11 +49,12 @@ main > section {
   }
 
   button {
-    padding: 8px 24px;
-    font-size: 1.2rem;
+    display: none;
+    padding: 12px 36px;
+    font-size: 3rem;
     font-weight: 700;
-    background-color: #00b894;
-    color: #333;
+    background-color: #a70505;
+    color: #fff;
     border-radius: 4px;
     border: 0;
     cursor: pointer;
@@ -206,6 +207,7 @@ main > section {
 }
 
 .inventory-container {
+  display: none;
   margin-top: 60px;
   text-align: center;
 
@@ -226,7 +228,7 @@ main > section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex-basis: 20%;
+      flex-basis: 25%;
       flex-grow: 1;
       margin-bottom: 12px;
   
@@ -234,9 +236,13 @@ main > section {
         width: 60px;
         height: 60px;
         border-radius: 50%;
+        margin-bottom: 10px;
       }
   
       .item-cost {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         font-size: 1.2rem;
         font-weight: 700;
       }
@@ -247,6 +253,18 @@ main > section {
       
       .item-effect {
         font-weight: 300;
+      }
+
+      .item-buy-button {
+        padding: 6px;
+        font-size: .8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background-color: #472727;
+        color: #fff;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
       }
     }
   }

@@ -7,24 +7,7 @@ const STAT_IMG_PATH = {
   health: "health.webp",
 }
 
-const ITEMS = [
-  // Armi
-  { name: "Sciabola di Ferro", type: "weapon", bonus: { strength: 4 }, cost: 30 },
-  { name: "Pistola a Pietra Focaia", type: "weapon", bonus: { strength: 6 }, cost: 50 },
-  { name: "Alabarda da Battaglia", type: "weapon", bonus: { strength: 8 }, cost: 80 },
-  { name: "Coltello da Lancio", type: "weapon", bonus: { strength: 3, dexterity: 2 }, cost: 25 },
-  { name: "Spada del Capitano", type: "weapon", bonus: { strength: 10 }, cost: 100 },
-  // Armature
-  { name: "Gilet di Cuoio", type: "armor", bonus: { endurance: 2 }, cost: 20 },
-  { name: "Giubbotto Imbottito", type: "armor", bonus: { endurance: 3 }, cost: 35 },
-  { name: "Corazza di Ferro", type: "armor", bonus: { endurance: 5 }, cost: 50 },
-  { name: "Giacca del Capitano", type: "armor", bonus: { endurance: 6 }, cost: 80 },
-  { name: "Armatura Completa", type: "armor", bonus: { endurance: 8 }, cost: 100 },
-  // Pozioni
-  { name: "Pozione Curativa", type: "health", bonus: { health: 30 }, cost: 15 },
-  { name: "Pozione di Forza", type: "health", bonus: { strength: 5, duration: 3 }, cost: 20 },
-  { name: "Pozione di Resistenza", type: "health", bonus: { endurance: 5, duration: 3 }, cost: 20 }
-]
+let ITEMS = [];
 
 const pirateClasses = [
   {
@@ -34,7 +17,9 @@ const pirateClasses = [
       strength: 14,
       dexterity: 12,
       endurance: 10,
-      luck: 8
+      luck: 8,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -44,7 +29,9 @@ const pirateClasses = [
       strength: 8,
       dexterity: 10,
       endurance: 12,
-      luck: 14
+      luck: 14,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -54,7 +41,9 @@ const pirateClasses = [
       strength: 10,
       dexterity: 16,
       endurance: 8,
-      luck: 12
+      luck: 12,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -64,7 +53,9 @@ const pirateClasses = [
       strength: 16,
       dexterity: 10,
       endurance: 14,
-      luck: 8
+      luck: 8,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -74,7 +65,9 @@ const pirateClasses = [
       strength: 10,
       dexterity: 12,
       endurance: 10,
-      luck: 14
+      luck: 14,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -84,7 +77,9 @@ const pirateClasses = [
       strength: 10,
       dexterity: 12,
       endurance: 12,
-      luck: 14
+      luck: 14,
+      gold: 0,
+      health: 100,
     }
   },
   {
@@ -94,7 +89,9 @@ const pirateClasses = [
       strength: 12,
       dexterity: 16,
       endurance: 10,
-      luck: 8
+      luck: 8,
+      gold: 0,
+      health: 100,
     }
   }
 ];
@@ -111,8 +108,8 @@ const player = {
     gold: 0,           // Quantità di oro posseduta dal pirata
   },
   equipment: {
-    weapon: "Pistola Mezza Rotta",  // Arma attuale del pirata
-    armor: "Leggera",  // Armatura attuale
+    weapon: "",  // Arma attuale del pirata
+    armor: "",  // Armatura attuale
   },
   calculateHitChance(target) {
     const baseHitChance = 50;  // Base % di probabilità di colpire
@@ -149,7 +146,6 @@ const player = {
     const reducedDamage = damage - this.stats.endurance;
     
     this.stats.health -= Math.max(reducedDamage, 0);
-    console.log("reduced", reducedDamage, this.stats.health);
 
     if (this.stats.health < 0) this.stats.health = 0;
   },
@@ -433,10 +429,9 @@ function renderInventory() {
     document.querySelector("#inventory").innerHTML += `
       <div class="item">
         <img src="assets/${type}.webp" />
-        <p class="item-cost">$${cost}</p>
+        <p class="item-cost">$${cost} <button data-item="${name}" class="item-buy-button">Buy!</button></p>
         <p class="item-name">${name}</p>
         <p class="item-effect">${bonusText}</p>
-        <button data-item="${name}" class="item-buy-button">Buy!</button>
       </div>
     `;
   });
@@ -454,11 +449,24 @@ function updateUI() {
 function startGame() {
   document.querySelector("#your-character").style.display = "none";
   document.querySelector("#battle").style.display = "flex";
+  document.querySelector("#inventory-container").style.display = "block";
   updateUI();
 }
 
+async function loadInventory() {
+  try {
+    const response = await fetch("http://localhost:3001/items");
+
+    if (response.ok) {
+      ITEMS = await response.json();
+    }
+  } catch(error) {
+    console.log(error);
+  }
+}
+
 window.addEventListener("load", function() {
-  // Gestione select classe
+  // Creazione Select Classe Personaggio
   document.querySelector("#character-class").innerHTML = `
     <option value="" selected disabled>Select class</option>
   `;
@@ -468,7 +476,11 @@ window.addEventListener("load", function() {
     `;
   });
 
+  loadInventory();
+
+  // Gestione Select Classe Personaggio
   document.querySelector("#character-class").addEventListener("change", function(e) {
+    document.querySelector("#start-button").style.display = "block";
     document.querySelector("#create-character-stats").innerHTML = "";
     document.querySelector("#character-class-description").innerHTML = "";
     const pirateClass = pirateClasses.find(item => item.className === e.target.value);
@@ -507,6 +519,4 @@ window.addEventListener("load", function() {
   document.querySelector("#attack-button").addEventListener("click", function() {
     combat();
   })
-
-  startGame();
 })
