@@ -129,7 +129,6 @@ const player = {
     if (hitRoll < hitChance) {
       // Colpo riuscito
       let baseDamage = this.stats.strength;  // Danno basato sulla forza
-      const weaponBonus = this.getWeaponBonus();
       const criticalChance = this.stats.luck;  // Usa la fortuna per determinare i critici
       const criticalRoll = Math.random() * 100;
       
@@ -138,7 +137,7 @@ const player = {
         baseDamage *= 2;  // Danno critico (raddoppiato)
       }
       
-      const totalDamage = baseDamage + weaponBonus;
+      const totalDamage = baseDamage;
       // Applica danno al bersaglio
       target.takeDamage(totalDamage);
       renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
@@ -147,28 +146,13 @@ const player = {
     }
   },
   takeDamage(damage) {
-    const armorBonuses = {
-      lightArmor: { damageReduction: 1, dexterityPenalty: 0 },
-      mediumArmor: { damageReduction: 3, dexterityPenalty: -1 },
-      heavyArmor: { damageReduction: 5, dexterityPenalty: -3 }
-    };
-    
-    // Ottiene il bonus dell'armatura
-    const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
-    const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
+    const reducedDamage = damage - this.stats.endurance;
     
     this.stats.health -= Math.max(reducedDamage, 0);
     console.log("reduced", reducedDamage, this.stats.health);
 
     if (this.stats.health < 0) this.stats.health = 0;
   },
-  getWeaponBonus() {
-    if (this.equipment.weapon === "Sciabola") {
-      return 5;
-    } else {
-      return 0;
-    }
-  }
 }
 
 const enemies = [
@@ -219,14 +203,7 @@ const enemies = [
       }
     },
     takeDamage(damage) {
-      const armorBonuses = {
-        lightArmor: { damageReduction: 1, dexterityPenalty: 0 },
-        mediumArmor: { damageReduction: 3, dexterityPenalty: -1 },
-        heavyArmor: { damageReduction: 5, dexterityPenalty: -3 }
-      };
-      
-      const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
-      const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
+      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
       
       this.stats.health -= Math.max(reducedDamage, 0);
   
@@ -283,14 +260,7 @@ const enemies = [
       }
     },
     takeDamage(damage) {
-      const armorBonuses = {
-        lightArmor: { damageReduction: 1, dexterityPenalty: 0 },
-        mediumArmor: { damageReduction: 3, dexterityPenalty: -1 },
-        heavyArmor: { damageReduction: 5, dexterityPenalty: -3 }
-      };
-      
-      const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
-      const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
+      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
       
       this.stats.health -= Math.max(reducedDamage, 0);
   
@@ -347,14 +317,7 @@ const enemies = [
       }
     },
     takeDamage(damage) {
-      const armorBonuses = {
-        lightArmor: { damageReduction: 1, dexterityPenalty: 0 },
-        mediumArmor: { damageReduction: 3, dexterityPenalty: -1 },
-        heavyArmor: { damageReduction: 5, dexterityPenalty: -3 }
-      };
-      
-      const damageReduction = armorBonuses[this.equipment.armor]?.damageReduction || 0;
-      const reducedDamage = damage - damageReduction - this.stats.endurance;  // Applica la riduzione del danno
+      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
       
       this.stats.health -= Math.max(reducedDamage, 0);
   
@@ -411,19 +374,21 @@ function renderStats(character, tagId) {
   })
 }
 
-function renderInventory(character, tagId) {
+function renderBattleInventory(character, tagId) {
   document.querySelector(tagId).innerHTML = "";
   Object.keys(character.equipment).forEach((key) => {
-    document.querySelector(tagId).innerHTML += `
-      <li><img src="assets/${key}.webp" alt="${key}"><span>${character.equipment[key]}</span></li>
-    `;
+    if (character.equipment[key]) {
+      document.querySelector(tagId).innerHTML += `
+        <li><img src="assets/${key}.webp" alt="${key}"><span>${character.equipment[key]}</span></li>
+      `;
+    }
   })
 }
 
 function renderPlayer() {
   document.querySelector("#player-name").innerText = player.name;
   renderStats(player, "#player-stats");
-  renderInventory(player, "#player-inventory");
+  renderBattleInventory(player, "#player-inventory");
 }
 
 function renderEnemy() {
@@ -431,10 +396,34 @@ function renderEnemy() {
   document.querySelector("#level").innerText = `Level ${currentLevel+1}`;
   document.querySelector("#enemy-name").innerText = enemy.name;
   renderStats(enemy, "#enemy-stats");
-  renderInventory(enemy, "#enemy-inventory");
+  renderBattleInventory(enemy, "#enemy-inventory");
+}
+
+function buyItem() {
+  const inventoryItem = ITEMS.find(item => {
+    return item.name === this.dataset.item;
+  });
+  if (inventoryItem && player.stats.gold < inventoryItem.cost) {
+    switch(inventoryItem.type) {
+      case "weapon":
+        player.equipment.weapon = inventoryItem.name;
+        break;
+      case "armor":
+        player.equipment.armor = inventoryItem.name;
+        break;
+    }
+    Object.keys(inventoryItem.bonus).forEach(property => {
+      player.stats[property] += inventoryItem.bonus[property];
+    })
+    player.stats.gold -= inventoryItem.cost;
+    renderPlayer();
+  }
 }
 
 function renderInventory() {
+  document.querySelectorAll(".item-buy-button").forEach(button => {
+    button.removeEventListener("click", buyItem);
+  });
   document.querySelector("#inventory").innerHTML = "";
   ITEMS.forEach(({ name, type, bonus, cost }) => {
     let bonusText = "";
@@ -447,8 +436,12 @@ function renderInventory() {
         <p class="item-cost">$${cost}</p>
         <p class="item-name">${name}</p>
         <p class="item-effect">${bonusText}</p>
+        <button data-item="${name}" class="item-buy-button">Buy!</button>
       </div>
     `;
+  });
+  document.querySelectorAll(".item-buy-button").forEach(button => {
+    button.addEventListener("click", buyItem);
   });
 }
 
