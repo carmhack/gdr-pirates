@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "node server.js",
-    "api": "json-server --watch inventory.json --port 3001"
+    "api": "json-server --watch db.json --port 3001"
   },
   "keywords": [],
   "author": "",

@@ -69,6 +69,7 @@ main > section {
     display: flex;
 
     .character-stat {
+      min-width: 10%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -105,6 +106,7 @@ main > section {
   }
 
   .character-name {
+    height: 100px;
     font-size: 2rem;
     font-weight: 700;
   }

@@ -1,0 +1,197 @@
+{
+  "items": [
+    {
+      "name": "Sciabola di Ferro",
+      "type": "weapon",
+      "bonus": {
+        "strength": 4
+      },
+      "cost": 30
+    },
+    {
+      "name": "Pistola a Pietra Focaia",
+      "type": "weapon",
+      "bonus": {
+        "strength": 6
+      },
+      "cost": 50
+    },
+    {
+      "name": "Alabarda da Battaglia",
+      "type": "weapon",
+      "bonus": {
+        "strength": 8
+      },
+      "cost": 80
+    },
+    {
+      "name": "Coltello da Lancio",
+      "type": "weapon",
+      "bonus": {
+        "strength": 3,
+        "dexterity": 2
+      },
+      "cost": 25
+    },
+    {
+      "name": "Spada del Capitano",
+      "type": "weapon",
+      "bonus": {
+        "strength": 10
+      },
+      "cost": 100
+    },
+    {
+      "name": "Gilet di Cuoio",
+      "type": "armor",
+      "bonus": {
+        "endurance": 2
+      },
+      "cost": 20
+    },
+    {
+      "name": "Giubbotto Imbottito",
+      "type": "armor",
+      "bonus": {
+        "endurance": 3
+      },
+      "cost": 35
+    },
+    {
+      "name": "Corazza di Ferro",
+      "type": "armor",
+      "bonus": {
+        "endurance": 5
+      },
+      "cost": 50
+    },
+    {
+      "name": "Giacca del Capitano",
+      "type": "armor",
+      "bonus": {
+        "endurance": 6
+      },
+      "cost": 80
+    },
+    {
+      "name": "Armatura Completa",
+      "type": "armor",
+      "bonus": {
+        "endurance": 8
+      },
+      "cost": 100
+    },
+    {
+      "name": "Pozione Curativa",
+      "type": "health",
+      "bonus": {
+        "health": 30
+      },
+      "cost": 15
+    },
+    {
+      "name": "Pozione di Forza",
+      "type": "health",
+      "bonus": {
+        "strength": 5,
+        "duration": 3
+      },
+      "cost": 20
+    },
+    {
+      "name": "Pozione di Resistenza",
+      "type": "health",
+      "bonus": {
+        "endurance": 5,
+        "duration": 3
+      },
+      "cost": 20
+    }
+  ],
+  "classes": [
+    {
+      "className": "Corsaro",
+      "description": "Un abile combattente specializzato nell'uso della sciabola e nelle battaglie corpo a corpo. I Corsari sono avventurieri impavidi, noti per la loro forza e coraggio sul campo di battaglia. Esperti di assalti navali, sono i leader dell'equipaggio durante gli scontri.",
+      "stats": {
+        "strength": 14,
+        "dexterity": 12,
+        "endurance": 10,
+        "luck": 8,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Sciamano del Mare",
+      "description": "Un mistico legato agli spiriti del mare e alle forze oceaniche. Lo Sciamano del Mare usa antichi poteri e incantesimi per controllare le acque, evocare creature marine o proteggere l'equipaggio dalle tempeste e dalle maledizioni.",
+      "stats": {
+        "strength": 8,
+        "dexterity": 10,
+        "endurance": 12,
+        "luck": 14,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Assassino del Porto",
+      "description": "Un maestro della furtività e degli attacchi rapidi e letali. L'Assassino del Porto è un pirata ombra, capace di muoversi inosservato e colpire silenziosamente, spesso eliminando i nemici prima che possano reagire.",
+      "stats": {
+        "strength": 10,
+        "dexterity": 16,
+        "endurance": 8,
+        "luck": 12,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Mastro d'Armi",
+      "description": "Un guerriero esperto nell'uso di diverse armi, dalle spade ai cannoni. Il Mastro d'Armi è una forza temibile in combattimento, capace di resistere ai colpi più duri e infliggere danni devastanti ai nemici, sia a bordo della nave che sul campo.",
+      "stats": {
+        "strength": 16,
+        "dexterity": 10,
+        "endurance": 14,
+        "luck": 8,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Contrabbandiere",
+      "description": "Un mercante illegale e astuto trafficante, il Contrabbandiere è maestro nel fare affari e nel muoversi nell'ombra. Sempre pronto a sfruttare ogni opportunità, riesce a eludere le autorità e a fare fortuna con carichi proibiti.",
+      "stats": {
+        "strength": 10,
+        "dexterity": 12,
+        "endurance": 10,
+        "luck": 14,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Mozzo Avventuriero",
+      "description": "Il giovane e inesperto mozzo, pronto a tutto pur di vivere avventure emozionanti. Sebbene non ancora esperto come i pirati veterani, il Mozzo Avventuriero è pieno di entusiasmo e fortuna, sempre alla ricerca di tesori e opportunità.",
+      "stats": {
+        "strength": 10,
+        "dexterity": 12,
+        "endurance": 12,
+        "luck": 14,
+        "health": 100,
+        "gold": 0
+      }
+    },
+    {
+      "className": "Spadaccino",
+      "description": "Un maestro del duello e dell'arte della spada, lo Spadaccino è preciso e letale nei combattimenti uno contro uno. Grazie alla sua incredibile destrezza e abilità con la lama, è in grado di sconfiggere nemici più potenti con eleganza e rapidità.",
+      "stats": {
+        "strength": 12,
+        "dexterity": 16,
+        "endurance": 10,
+        "luck": 8,
+        "health": 100,
+        "gold": 0
+      }
+    }
+  ]  
+}

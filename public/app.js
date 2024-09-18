@@ -8,97 +8,11 @@ const STAT_IMG_PATH = {
 }
 
 let ITEMS = [];
-
-const pirateClasses = [
-  {
-    className: "Corsaro",
-    description: "Un abile combattente specializzato nell'uso della sciabola e nelle battaglie corpo a corpo. I Corsari sono avventurieri impavidi, noti per la loro forza e coraggio sul campo di battaglia. Esperti di assalti navali, sono i leader dell'equipaggio durante gli scontri.",
-    stats: {
-      strength: 14,
-      dexterity: 12,
-      endurance: 10,
-      luck: 8,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Sciamano del Mare",
-    description: "Un mistico legato agli spiriti del mare e alle forze oceaniche. Lo Sciamano del Mare usa antichi poteri e incantesimi per controllare le acque, evocare creature marine o proteggere l'equipaggio dalle tempeste e dalle maledizioni.",
-    stats: {
-      strength: 8,
-      dexterity: 10,
-      endurance: 12,
-      luck: 14,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Assassino del Porto",
-    description: "Un maestro della furtività e degli attacchi rapidi e letali. L'Assassino del Porto è un pirata ombra, capace di muoversi inosservato e colpire silenziosamente, spesso eliminando i nemici prima che possano reagire.",
-    stats: {
-      strength: 10,
-      dexterity: 16,
-      endurance: 8,
-      luck: 12,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Mastro d'Armi",
-    description: "Un guerriero esperto nell'uso di diverse armi, dalle spade ai cannoni. Il Mastro d'Armi è una forza temibile in combattimento, capace di resistere ai colpi più duri e infliggere danni devastanti ai nemici, sia a bordo della nave che sul campo.",
-    stats: {
-      strength: 16,
-      dexterity: 10,
-      endurance: 14,
-      luck: 8,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Contrabbandiere",
-    description: "Un mercante illegale e astuto trafficante, il Contrabbandiere è maestro nel fare affari e nel muoversi nell'ombra. Sempre pronto a sfruttare ogni opportunità, riesce a eludere le autorità e a fare fortuna con carichi proibiti.",
-    stats: {
-      strength: 10,
-      dexterity: 12,
-      endurance: 10,
-      luck: 14,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Mozzo Avventuriero",
-    description: "Il giovane e inesperto mozzo, pronto a tutto pur di vivere avventure emozionanti. Sebbene non ancora esperto come i pirati veterani, il Mozzo Avventuriero è pieno di entusiasmo e fortuna, sempre alla ricerca di tesori e opportunità.",
-    stats: {
-      strength: 10,
-      dexterity: 12,
-      endurance: 12,
-      luck: 14,
-      gold: 0,
-      health: 100,
-    }
-  },
-  {
-    className: "Spadaccino",
-    description: "Un maestro del duello e dell'arte della spada, lo Spadaccino è preciso e letale nei combattimenti uno contro uno. Grazie alla sua incredibile destrezza e abilità con la lama, è in grado di sconfiggere nemici più potenti con eleganza e rapidità.",
-    stats: {
-      strength: 12,
-      dexterity: 16,
-      endurance: 10,
-      luck: 8,
-      gold: 0,
-      health: 100,
-    }
-  }
-];
+let CLASSES = [];
 
 const player = {
-  name: "Adriano",
-  className: "Corsaro", // Classe del pirata, es. "Capitano", "Artigliere", ecc.
+  name: "",
+  className: "", // Classe del pirata, es. "Capitano", "Artigliere", ecc.
   stats: {
     strength: 14,      // Forza fisica per attacchi corpo a corpo
     dexterity: 12,     // Abilità e velocità nei movimenti
@@ -324,6 +238,7 @@ const enemies = [
     }
   }
 ];
+
 let currentLevel = 0;
 
 function combat() {
@@ -399,7 +314,7 @@ function buyItem() {
   const inventoryItem = ITEMS.find(item => {
     return item.name === this.dataset.item;
   });
-  if (inventoryItem && player.stats.gold < inventoryItem.cost) {
+  if (inventoryItem && player.stats.gold >= inventoryItem.cost) {
     switch(inventoryItem.type) {
       case "weapon":
         player.equipment.weapon = inventoryItem.name;
@@ -413,6 +328,14 @@ function buyItem() {
     })
     player.stats.gold -= inventoryItem.cost;
     renderPlayer();
+  } else {
+    Toastify({
+      text: "You don't have enough gold!",
+      style: {
+        color: "#222",
+        background: "linear-gradient(90deg, rgba(100,104,110,1) 0%, rgba(85,239,196,1) 100%)"
+      }
+    }).showToast();
   }
 }
 
@@ -453,37 +376,38 @@ function startGame() {
   updateUI();
 }
 
-async function loadInventory() {
+async function getEntity(entity) {
   try {
-    const response = await fetch("http://localhost:3001/items");
+    const response = await fetch(`http://localhost:3001/${entity}`);
 
     if (response.ok) {
-      ITEMS = await response.json();
+      return await response.json();
     }
   } catch(error) {
     console.log(error);
   }
 }
 
-window.addEventListener("load", function() {
+window.addEventListener("load", async function() {
+  ITEMS = await getEntity("items");
+  CLASSES = await getEntity("classes");
+
   // Creazione Select Classe Personaggio
   document.querySelector("#character-class").innerHTML = `
     <option value="" selected disabled>Select class</option>
   `;
-  pirateClasses.forEach(item => {
+  CLASSES.forEach(item => {
     document.querySelector("#character-class").innerHTML += `
       <option value="${item.className}">${item.className}</option>
     `;
   });
-
-  loadInventory();
 
   // Gestione Select Classe Personaggio
   document.querySelector("#character-class").addEventListener("change", function(e) {
     document.querySelector("#start-button").style.display = "block";
     document.querySelector("#create-character-stats").innerHTML = "";
     document.querySelector("#character-class-description").innerHTML = "";
-    const pirateClass = pirateClasses.find(item => item.className === e.target.value);
+    const pirateClass = CLASSES.find(item => item.className === e.target.value);
     document.querySelector("#character-class-description").innerHTML = `
       <p>${pirateClass.description}</p>
     `;
@@ -509,7 +433,13 @@ window.addEventListener("load", function() {
   // Gestione pulsante START
   document.querySelector("#start-button").addEventListener("click", function() {
     if(player.name === "" || player.className ===  "") {
-      alert("Name and class are required!");
+      Toastify({
+        text: "You need a class and a name to play!",
+        style: {
+          color: "#222",
+          background: "linear-gradient(90deg, rgba(100,104,110,1) 0%, rgba(85,239,196,1) 100%)"
+        }
+      }).showToast();
     } else {
       startGame();
     }
