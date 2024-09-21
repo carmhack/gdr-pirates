@@ -1,3 +1,4 @@
+/** Utils */
 const STAT_IMG_PATH = {
   strength: "strength.webp",
   dexterity: "dexterity.webp",
@@ -7,259 +8,104 @@ const STAT_IMG_PATH = {
   health: "health.webp",
 }
 
-let ITEMS = [];
-let CLASSES = [];
+async function getEntity(entity) {
+  try {
+    const response = await fetch(`http://localhost:3001/${entity}`);
 
-const player = {
-  name: "",
-  className: "", // Classe del pirata, es. "Capitano", "Artigliere", ecc.
-  stats: {
-    strength: 14,      // Forza fisica per attacchi corpo a corpo
-    dexterity: 12,     // Abilità e velocità nei movimenti
-    endurance: 10,     // Resistenza fisica e capacità di sopportare danni
-    luck: 8,           // Fortuna, può influire su eventi casuali o colpi critici
-    health: 100,       // Punti salute
-    gold: 0,           // Quantità di oro posseduta dal pirata
-  },
-  equipment: {
-    weapon: "",  // Arma attuale del pirata
-    armor: "",  // Armatura attuale
-  },
-  calculateHitChance(target) {
-    const baseHitChance = 50;  // Base % di probabilità di colpire
-    const dexterityBonus = this.stats.dexterity * 2; // La destrezza aggiunge precisione
-    const evasion = target.stats.dexterity * 2; // La destrezza del bersaglio riduce la probabilità di colpire
-
-    return baseHitChance + dexterityBonus - evasion;
-  },
-  attack(target) {
-    renderBattleLog(`${this.name} attacca ${target.name}`);
-    const hitChance = this.calculateHitChance(target);
-    const hitRoll = Math.random() * 100;  // Tira un numero tra 0 e 100
-
-    if (hitRoll < hitChance) {
-      // Colpo riuscito
-      let baseDamage = this.stats.strength;  // Danno basato sulla forza
-      const criticalChance = this.stats.luck;  // Usa la fortuna per determinare i critici
-      const criticalRoll = Math.random() * 100;
-      
-      // Se il roll critico è inferiore alla fortuna, infliggi un critico
-      if (criticalRoll < criticalChance) {
-        baseDamage *= 2;  // Danno critico (raddoppiato)
-      }
-      
-      const totalDamage = baseDamage;
-      // Applica danno al bersaglio
-      target.takeDamage(totalDamage);
-      renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
-    } else {
-      renderBattleLog(`${this.name} ha mancato l'attacco!`);
+    if (response.ok) {
+      return await response.json();
     }
-  },
-  takeDamage(damage) {
-    const reducedDamage = damage - this.stats.endurance;
-    
-    this.stats.health -= Math.max(reducedDamage, 0);
-
-    if (this.stats.health < 0) this.stats.health = 0;
-  },
+  } catch(error) {
+    console.log(error);
+  }
 }
 
-const enemies = [
-  {
-    name: "Pirata Principiante",
-    className: "Corsaro",
-    stats: {
-      strength: 5,
-      dexterity: 5,
-      endurance: 5,
-      luck: 5,
-      health: 50,
-      gold: 50,
-    },
-    equipment: {
-      weapon: "Pugnale",
-      armor: "",
-    },
+function createCharacter(name, className, stats, equipment, bonus = 0) {
+  return {
+    name,
+    className,
+    stats,
+    equipment,
     calculateHitChance(target) {
-      const baseHitChance = 50;
-      const dexterityBonus = this.stats.dexterity * 2;
-      const evasion = target.stats.dexterity * 2;
+      const baseHitChance = 50;  // Base % di probabilità di colpire
+      const dexterityBonus = this.stats.dexterity * 2; // La destrezza aggiunge precisione
+      const evasion = target.stats.dexterity * 2; // La destrezza del bersaglio riduce la probabilità di colpire
   
       return baseHitChance + dexterityBonus - evasion;
     },
     attack(target) {
-      renderBattleLog(`${this.name} attacca ${target.name}`);
       const hitChance = this.calculateHitChance(target);
-      const hitRoll = Math.random() * 100;
+      const hitRoll = Math.random() * 100;  // Tira un numero tra 0 e 100
   
       if (hitRoll < hitChance) {
         // Colpo riuscito
-        let baseDamage = this.stats.strength;
-        const weaponBonus = this.getWeaponBonus();
-        const criticalChance = this.stats.luck;
+        let baseDamage = this.stats.strength;  // Danno basato sulla forza
+        const weaponBonus = bonus;
+        const criticalChance = this.stats.luck;  // Usa la fortuna per determinare i critici
         const criticalRoll = Math.random() * 100;
         
+        // Se il roll critico è inferiore alla fortuna, infliggi un critico
         if (criticalRoll < criticalChance) {
-          baseDamage *= 2;
+          baseDamage *= 2;  // Danno critico (raddoppiato)
         }
-
-        const totalDamage = baseDamage + weaponBonus;
-        target.takeDamage(totalDamage);
-
-        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
-      } else {
-        renderBattleLog(`${this.name} ha mancato l'attacco!`);
+        
+        // Applica danno al bersaglio
+        target.takeDamage(baseDamage + weaponBonus);
       }
     },
     takeDamage(damage) {
-      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
-      
+      const reducedDamage = damage - this.stats.endurance;
       this.stats.health -= Math.max(reducedDamage, 0);
-  
-      if (this.stats.health < 0) this.stats.health = 0;
+      return this.stats.health <= 0;
     },
-    getWeaponBonus() {
-      return 1;
-    }
-  },
-  {
-    name: "Pirata Esperto",
-    className: "Assassino del Porto",
-    stats: {
-      strength: 10,
-      dexterity: 12,
-      endurance: 10,
-      luck: 8,
-      health: 100,
-      gold: 150,
-    },
-    equipment: {
-      weapon: "Sciabola",
-      armor: "Leggera",
-    },
-    calculateHitChance(target) {
-      const baseHitChance = 50;
-      const dexterityBonus = this.stats.dexterity * 2;
-      const evasion = target.stats.dexterity * 2;
-  
-      return baseHitChance + dexterityBonus - evasion;
-    },
-    attack(target) {
-      renderBattleLog(`${this.name} attacca ${target.name}`);
-      const hitChance = this.calculateHitChance(target);
-      const hitRoll = Math.random() * 100;
-  
-      if (hitRoll < hitChance) {
-        // Colpo riuscito
-        let baseDamage = this.stats.strength;
-        const weaponBonus = this.getWeaponBonus();
-        const criticalChance = this.stats.luck;
-        const criticalRoll = Math.random() * 100;
-        
-        if (criticalRoll < criticalChance) {
-          baseDamage *= 2;
-        }
-
-        const totalDamage = baseDamage + weaponBonus;
-        target.takeDamage(totalDamage);
-
-        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
-      } else {
-        renderBattleLog(`${this.name} ha mancato l'attacco!`);
-      }
-    },
-    takeDamage(damage) {
-      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
-      
-      this.stats.health -= Math.max(reducedDamage, 0);
-  
-      if (this.stats.health < 0) this.stats.health = 0;
-    },
-    getWeaponBonus() {
-      return 3;
-    }
-  },
-  {
-    name: "Pirata Veterano",
-    className: "Mastro d'Armi",
-    stats: {
-      strength: 15,
-      dexterity: 14,
-      endurance: 12,
-      luck: 12,
-      health: 100,
-      gold: 300,
-    },
-    equipment: {
-      weapon: "Alabarda",
-      armor: "Media",
-    },
-    calculateHitChance(target) {
-      const baseHitChance = 50;
-      const dexterityBonus = this.stats.dexterity * 2;
-      const evasion = target.stats.dexterity * 2;
-  
-      return baseHitChance + dexterityBonus - evasion;
-    },
-    attack(target) {
-      renderBattleLog(`${this.name} attacca ${target.name}`);
-      const hitChance = this.calculateHitChance(target);
-      const hitRoll = Math.random() * 100;
-  
-      if (hitRoll < hitChance) {
-        // Colpo riuscito
-        let baseDamage = this.stats.strength;
-        const weaponBonus = this.getWeaponBonus();
-        const criticalChance = this.stats.luck;
-        const criticalRoll = Math.random() * 100;
-        
-        if (criticalRoll < criticalChance) {
-          baseDamage *= 2;
-        }
-
-        const totalDamage = baseDamage + weaponBonus;
-        target.takeDamage(totalDamage);
-
-        renderBattleLog(`${target.name} subisce un attacco di ${totalDamage}. La sua salute scende a ${target.stats.health}`);
-      } else {
-        renderBattleLog(`${this.name} ha mancato l'attacco!`);
-      }
-    },
-    takeDamage(damage) {
-      const reducedDamage = damage - this.stats.endurance;  // Applica la riduzione del danno
-      
-      this.stats.health -= Math.max(reducedDamage, 0);
-  
-      if (this.stats.health < 0) this.stats.health = 0;
-    },
-    getWeaponBonus() {
-      return 5;
-    }
   }
+}
+
+/* Game data */
+let DEFAULT_INCREMENT = 2;
+let HEALTH_INCREMENT = 20;
+let items = [];
+let classes = [];
+let player = null;
+let selectedClass = null;
+let currentLevel = 0;
+const enemies = [
+  createCharacter("Pirata Principiante", "Corsaro", {
+    strength: 5,
+    dexterity: 5,
+    endurance: 5,
+    luck: 5,
+    health: 50,
+    gold: 50,
+  }, {
+    weapon: "Pugnale",
+    armor: "",
+  }, 1),
+  createCharacter("Pirata Esperto", "Assassino del Porto", {
+    strength: 10,
+    dexterity: 12,
+    endurance: 10,
+    luck: 8,
+    health: 100,
+    gold: 150,
+  }, {
+    weapon: "Sciabola",
+    armor: "Leggera",
+  }, 3),
+  createCharacter("Pirata Veterano", "Mastro d'Armi", {
+    strength: 15,
+    dexterity: 14,
+    endurance: 12,
+    luck: 12,
+    health: 100,
+    gold: 300,
+  }, {
+    weapon: "Alabarda",
+    armor: "Media",
+  }, 5),
 ];
 
-let currentLevel = 0;
-
-function combat() {
-  emptyBattleLog();
-  const enemy = enemies[currentLevel];
-  player.attack(enemy);
-  enemy.attack(player);
-
-  if (enemy.stats.health <= 0) {
-    player.stats.gold += enemy.stats.gold;
-    player.stats.strength += 2;
-    player.stats.dexterity += 2;
-    player.stats.endurance += 2;
-    player.stats.luck += 2;
-    player.stats.health += 20;
-    currentLevel++;
-  }
-
-  updateUI();
-}
-
+/** Funzioni di Rendering */
 function emptyBattleLog() {
   document.querySelector("#battle-log").innerHTML = "";
 }
@@ -296,13 +142,13 @@ function renderBattleInventory(character, tagId) {
   })
 }
 
-function renderPlayer() {
+function renderPlayerInfo() {
   document.querySelector("#player-name").innerText = player.name;
   renderStats(player, "#player-stats");
   renderBattleInventory(player, "#player-inventory");
 }
 
-function renderEnemy() {
+function renderEnemyInfo() {
   const enemy = enemies[currentLevel];
   document.querySelector("#level").innerText = `Level ${currentLevel+1}`;
   document.querySelector("#enemy-name").innerText = enemy.name;
@@ -310,41 +156,12 @@ function renderEnemy() {
   renderBattleInventory(enemy, "#enemy-inventory");
 }
 
-function buyItem() {
-  const inventoryItem = ITEMS.find(item => {
-    return item.name === this.dataset.item;
-  });
-  if (inventoryItem && player.stats.gold >= inventoryItem.cost) {
-    switch(inventoryItem.type) {
-      case "weapon":
-        player.equipment.weapon = inventoryItem.name;
-        break;
-      case "armor":
-        player.equipment.armor = inventoryItem.name;
-        break;
-    }
-    Object.keys(inventoryItem.bonus).forEach(property => {
-      player.stats[property] += inventoryItem.bonus[property];
-    })
-    player.stats.gold -= inventoryItem.cost;
-    renderPlayer();
-  } else {
-    Toastify({
-      text: "You don't have enough gold!",
-      style: {
-        color: "#222",
-        background: "linear-gradient(90deg, rgba(100,104,110,1) 0%, rgba(85,239,196,1) 100%)"
-      }
-    }).showToast();
-  }
-}
-
 function renderInventory() {
   document.querySelectorAll(".item-buy-button").forEach(button => {
     button.removeEventListener("click", buyItem);
   });
   document.querySelector("#inventory").innerHTML = "";
-  ITEMS.forEach(({ name, type, bonus, cost }) => {
+  items.forEach(({ name, type, bonus, cost }) => {
     let bonusText = "";
     Object.keys(bonus).forEach(effect => {
       bonusText += `${effect}: +${bonus[effect]}\n`;
@@ -363,40 +180,87 @@ function renderInventory() {
   });
 }
 
-function updateUI() {
-  renderPlayer();
-  renderEnemy();
-  renderInventory();
+/** Funzioni di Gioco */
+function combat() {
+  emptyBattleLog();
+  const enemy = enemies[currentLevel];
+  const enemyHealthBeforeAttack = enemy.stats.health;
+  const playerHealthBeforeAttack = player.stats.health;
+
+  player.attack(enemy);
+  enemy.attack(player);
+
+  if (enemy.stats.health < enemyHealthBeforeAttack) {
+    renderBattleLog(`${player.name} subisce un attacco: la sua salute scende a ${enemy.stats.health}`);
+  } else {
+    renderBattleLog(`${player.name} ha mancato l'attacco!`);
+  }
+
+  if (player.stats.health < playerHealthBeforeAttack) {
+    renderBattleLog(`${player.name} subisce un attacco: la sua salute scende a ${player.stats.health}`);
+  } else {
+    renderBattleLog(`${enemy.name} ha mancato l'attacco!`);
+  }
+
+  // Nemico sconfitto
+  if (enemy.stats.health <= 0) {
+    player.stats.gold += enemy.stats.gold;
+    player.stats.strength += DEFAULT_INCREMENT;
+    player.stats.dexterity += DEFAULT_INCREMENT;
+    player.stats.endurance += DEFAULT_INCREMENT;
+    player.stats.luck += DEFAULT_INCREMENT;
+    player.stats.health += HEALTH_INCREMENT;
+    currentLevel++;
+  }
+
+  update();
 }
 
-function startGame() {
-  document.querySelector("#your-character").style.display = "none";
-  document.querySelector("#battle").style.display = "flex";
-  document.querySelector("#inventory-container").style.display = "block";
-  updateUI();
-}
-
-async function getEntity(entity) {
-  try {
-    const response = await fetch(`http://localhost:3001/${entity}`);
-
-    if (response.ok) {
-      return await response.json();
+function buyItem() {
+  const inventoryItem = items.find(item => {
+    return item.name === this.dataset.item;
+  });
+  if (inventoryItem && player.stats.gold >= inventoryItem.cost) {
+    switch(inventoryItem.type) {
+      case "weapon":
+        player.equipment.weapon = inventoryItem.name;
+        break;
+      case "armor":
+        player.equipment.armor = inventoryItem.name;
+        break;
     }
-  } catch(error) {
-    console.log(error);
+    Object.keys(inventoryItem.bonus).forEach(property => {
+      player.stats[property] += inventoryItem.bonus[property];
+    })
+    player.stats.gold -= inventoryItem.cost;
+    renderPlayerInfo();
+  } else {
+    Toastify({
+      text: "You don't have enough gold!",
+      style: {
+        color: "#222",
+        background: "linear-gradient(90deg, rgba(100,104,110,1) 0%, rgba(85,239,196,1) 100%)"
+      }
+    }).showToast();
   }
 }
 
+function update() {
+  renderPlayerInfo();
+  renderEnemyInfo();
+}
+
+/** Main function */
 window.addEventListener("load", async function() {
-  ITEMS = await getEntity("items");
-  CLASSES = await getEntity("classes");
+  // API per ottenere items e classi personaggi
+  items = await getEntity("items");
+  classes = await getEntity("classes");
 
   // Creazione Select Classe Personaggio
   document.querySelector("#character-class").innerHTML = `
     <option value="" selected disabled>Select class</option>
   `;
-  CLASSES.forEach(item => {
+  classes.forEach(item => {
     document.querySelector("#character-class").innerHTML += `
       <option value="${item.className}">${item.className}</option>
     `;
@@ -404,35 +268,29 @@ window.addEventListener("load", async function() {
 
   // Gestione Select Classe Personaggio
   document.querySelector("#character-class").addEventListener("change", function(e) {
-    document.querySelector("#start-button").style.display = "block";
     document.querySelector("#create-character-stats").innerHTML = "";
     document.querySelector("#character-class-description").innerHTML = "";
-    const pirateClass = CLASSES.find(item => item.className === e.target.value);
+    selectedClass = classes.find(item => item.className === e.target.value);
     document.querySelector("#character-class-description").innerHTML = `
-      <p>${pirateClass.description}</p>
+      <p>${selectedClass.description}</p>
     `;
-    Object.keys(pirateClass.stats).forEach(stat => {
+    Object.keys(selectedClass.stats).forEach(stat => {
       document.querySelector("#create-character-stats").innerHTML += `
         <div class="character-stat">
           <img src="assets/${STAT_IMG_PATH[stat]}">
-          <p class="stat-value">${pirateClass.stats[stat]}</p>
+          <p class="stat-value">${selectedClass.stats[stat]}</p>
           <p class="stat-name">${stat}</p>
         </div>
       `;
     })
-    player.className = pirateClass.className;
-    player.stats = { ...pirateClass.stats };
-    
   })
-
-  // Gestione input nome
-  document.querySelector("#character-name").addEventListener("change", function(e) {
-    player.name = e.target.value;
-  });
 
   // Gestione pulsante START
   document.querySelector("#start-button").addEventListener("click", function() {
-    if(player.name === "" || player.className ===  "") {
+    const playerName = document.querySelector("#character-name").value;
+    const playerClass = document.querySelector("#character-class").value;
+    
+    if(playerName === "" || playerClass ===  "") {
       Toastify({
         text: "You need a class and a name to play!",
         style: {
@@ -441,12 +299,15 @@ window.addEventListener("load", async function() {
         }
       }).showToast();
     } else {
-      startGame();
+      document.querySelector("#your-character").style.display = "none";
+      document.querySelector("#battle").style.display = "flex";
+      document.querySelector("#inventory-container").style.display = "block";
+      player = createCharacter(playerName, playerClass, selectedClass.stats, { weapon: null, armor: null });
+      renderInventory();
+      update();
     }
   })
 
-  // Gestione pulsante attacco
-  document.querySelector("#attack-button").addEventListener("click", function() {
-    combat();
-  })
+  // Gestione pulsante ATTACK
+  document.querySelector("#attack-button").addEventListener("click", combat);
 })
