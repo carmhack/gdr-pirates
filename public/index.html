@@ -14,32 +14,36 @@
     </header>
 
     <main>
-      <section id="your-character">
-        <h2>Create your player</h2>
-        <div class="create-character-inputs">
-          <select name="character-class" id="character-class"></select>
-          <input type="text" id="character-name" value="Adrian" placeholder="Name">
+      <section class="create-character">
+        <h2>Create your pirate!</h2>
+        <input type="text" id="character-name" value="Jim Hawkins" placeholder="e.g. Jim Hawkins">
+        <div class="characters">
+          <div class="character-options" id="character-options"></div>
+          <div class="character-preview" id="character-preview">
+            <p class="character-preview-title"></p>
+            <img class="character-preview-image">
+            <p class="character-preview-description"></p>
+            <div class="character-preview-stats"></div>
+          </div>
         </div>
-        <div id="character-class-description"></div>
-        <div id="create-character-stats" class="create-character-stats"></div>
-        <button type="button" id="start-button">Sail!</button>
+        <button class="start-btn" type="button" id="start-btn">Let's go!</button>
       </section>
 
-      <section id="battle">
-        <div class="player">
-          <p id="player-name" class="character-name"></p>
+      <section id="game">
+        <div class="player-info">
+          <img id="player-image" class="info-image">
+          <p id="player-name" class="info-name"></p>
           <ul id="player-stats" class="list"></ul>
           <ul id="player-inventory" class="list battle-inventory"></ul>
         </div>
-        <div class="board">
-          <p id="level" class="level"></p>
-          <div class="commands">
-            <button type="button" id="attack-button">Attack!</button>
-          </div>
-          <ul id="battle-log" class="log"></ul>
+        <div class="game-info">
+          <p id="game-level" class="game-level"></p>
+          <button type="button" id="attack-btn" class="attack-btn">Attack!</button>
+          <ul id="game-log" class="game-log"></ul>
         </div>
-        <div class="enemy">
-          <p id="enemy-name" class="character-name"></p>
+        <div class="player-info">
+          <img id="enemy-image" class="info-image">
+          <p id="enemy-name" class="info-name"></p>
           <ul id="enemy-stats" class="list"></ul>
           <ul id="enemy-inventory" class="list battle-inventory"></ul>
         </div>
@@ -47,6 +51,12 @@
 
       <section id="inventory-container" class="inventory-container">
         <h2>Pirate Shop</h2>
+        <div class="inventory-filters">
+          <button class="inventory-filter" data-filter="all">All</button>
+          <button class="inventory-filter" data-filter="weapon">Weapon</button>
+          <button class="inventory-filter" data-filter="armor">Armor</button>
+          <button class="inventory-filter" data-filter="potion">Potion</button>
+        </div>
         <div id="inventory"></div>
       </section>
     </main>

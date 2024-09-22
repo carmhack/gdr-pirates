@@ -8,6 +8,15 @@ const STAT_IMG_PATH = {
   health: "health.webp",
 }
 
+const MAX = {
+  strength: 20,
+  dexterity: 20,
+  endurance: 20,
+  luck: 20,
+  gold: 400,
+  health: 150,
+}
+
 async function getEntity(entity) {
   try {
     const response = await fetch(`http://localhost:3001/${entity}`);
@@ -70,7 +79,7 @@ let player = null;
 let selectedClass = null;
 let currentLevel = 0;
 const enemies = [
-  createCharacter("Pirata Principiante", "Corsaro", {
+  createCharacter("Sgherro", "Corsaro", {
     strength: 5,
     dexterity: 5,
     endurance: 5,
@@ -81,7 +90,7 @@ const enemies = [
     weapon: "Pugnale",
     armor: "",
   }, 1),
-  createCharacter("Pirata Esperto", "Assassino del Porto", {
+  createCharacter("Grimjaw", "Assassino del Porto", {
     strength: 10,
     dexterity: 12,
     endurance: 10,
@@ -92,7 +101,7 @@ const enemies = [
     weapon: "Sciabola",
     armor: "Leggera",
   }, 3),
-  createCharacter("Pirata Veterano", "Mastro d'Armi", {
+  createCharacter("Barbarossa", "Mastro d'Armi", {
     strength: 15,
     dexterity: 14,
     endurance: 12,
@@ -106,15 +115,15 @@ const enemies = [
 ];
 
 /** Funzioni di Rendering */
-function emptyBattleLog() {
-  document.querySelector("#battle-log").innerHTML = "";
+function emptyGameLog() {
+  document.querySelector("#game-log").innerHTML = "";
 }
 
-function renderBattleLog(text) {
+function renderGameLog(text) {
   const newLog = document.createElement("li");
   newLog.textContent = text;
 
-  const ul = document.querySelector("#battle-log");
+  const ul = document.querySelector("#game-log");
   ul.appendChild(newLog);
 
   setTimeout(() => {
@@ -126,7 +135,10 @@ function renderStats(character, tagId) {
   document.querySelector(tagId).innerHTML = "";
   Object.keys(character.stats).forEach((stat) => {
     document.querySelector(tagId).innerHTML += `
-      <li><img src="assets/${stat}.webp" alt="${stat}"><span class="stat-value">${character.stats[stat]}</span><span class="stat-name">${stat}</span></li>
+      <li>
+        <label for="${stat}">${stat}</label>
+        <progress id="${stat}" value="${character.stats[stat]}" max="${MAX[stat]}">${character.stats[stat]}</progress>
+      </li>
     `;
   })
 }
@@ -136,13 +148,14 @@ function renderBattleInventory(character, tagId) {
   Object.keys(character.equipment).forEach((key) => {
     if (character.equipment[key]) {
       document.querySelector(tagId).innerHTML += `
-        <li><img src="assets/${key}.webp" alt="${key}"><span>${character.equipment[key]}</span></li>
+        <li><img class="stat-icon" src="assets/${key}.webp" alt="${key}"><span>${character.equipment[key]}</span></li>
       `;
     }
   })
 }
 
 function renderPlayerInfo() {
+  document.querySelector("#player-image").src = `assets/${selectedClass.slug}.webp`;
   document.querySelector("#player-name").innerText = player.name;
   renderStats(player, "#player-stats");
   renderBattleInventory(player, "#player-inventory");
@@ -150,7 +163,8 @@ function renderPlayerInfo() {
 
 function renderEnemyInfo() {
   const enemy = enemies[currentLevel];
-  document.querySelector("#level").innerText = `Level ${currentLevel+1}`;
+  document.querySelector("#game-level").innerText = `Level ${currentLevel+1}`;
+  document.querySelector("#enemy-image").src = `assets/enemy.webp`;
   document.querySelector("#enemy-name").innerText = enemy.name;
   renderStats(enemy, "#enemy-stats");
   renderBattleInventory(enemy, "#enemy-inventory");
@@ -182,7 +196,7 @@ function renderInventory() {
 
 /** Funzioni di Gioco */
 function combat() {
-  emptyBattleLog();
+  emptyGameLog();
   const enemy = enemies[currentLevel];
   const enemyHealthBeforeAttack = enemy.stats.health;
   const playerHealthBeforeAttack = player.stats.health;
@@ -191,15 +205,15 @@ function combat() {
   enemy.attack(player);
 
   if (enemy.stats.health < enemyHealthBeforeAttack) {
-    renderBattleLog(`${player.name} subisce un attacco: la sua salute scende a ${enemy.stats.health}`);
+    renderGameLog(`${player.name} subisce un attacco: la sua salute scende a ${enemy.stats.health}`);
   } else {
-    renderBattleLog(`${player.name} ha mancato l'attacco!`);
+    renderGameLog(`${player.name} ha mancato l'attacco!`);
   }
 
   if (player.stats.health < playerHealthBeforeAttack) {
-    renderBattleLog(`${player.name} subisce un attacco: la sua salute scende a ${player.stats.health}`);
+    renderGameLog(`${player.name} subisce un attacco: la sua salute scende a ${player.stats.health}`);
   } else {
-    renderBattleLog(`${enemy.name} ha mancato l'attacco!`);
+    renderGameLog(`${enemy.name} ha mancato l'attacco!`);
   }
 
   // Nemico sconfitto
@@ -256,41 +270,42 @@ window.addEventListener("load", async function() {
   items = await getEntity("items");
   classes = await getEntity("classes");
 
-  // Creazione Select Classe Personaggio
-  document.querySelector("#character-class").innerHTML = `
-    <option value="" selected disabled>Select class</option>
-  `;
+  // Creazione Pulsanti Classe Personaggio
   classes.forEach(item => {
-    document.querySelector("#character-class").innerHTML += `
-      <option value="${item.className}">${item.className}</option>
+    document.querySelector("#character-options").innerHTML += `
+      <button class="character-option" data-class="${item.slug}">${item.className}</button>
     `;
   });
 
-  // Gestione Select Classe Personaggio
-  document.querySelector("#character-class").addEventListener("change", function(e) {
-    document.querySelector("#create-character-stats").innerHTML = "";
-    document.querySelector("#character-class-description").innerHTML = "";
-    selectedClass = classes.find(item => item.className === e.target.value);
-    document.querySelector("#character-class-description").innerHTML = `
-      <p>${selectedClass.description}</p>
-    `;
-    Object.keys(selectedClass.stats).forEach(stat => {
-      document.querySelector("#create-character-stats").innerHTML += `
-        <div class="character-stat">
-          <img src="assets/${STAT_IMG_PATH[stat]}">
-          <p class="stat-value">${selectedClass.stats[stat]}</p>
-          <p class="stat-name">${stat}</p>
-        </div>
-      `;
+  // Gestione Pulsanti Classe Personaggio
+  const classOptions = document.querySelectorAll(".character-option");
+  classOptions.forEach(option => {
+    option.addEventListener("click", function() {
+      document.querySelector(".character-preview-stats").innerHTML = "";
+      document.querySelector(".character-preview-description").innerHTML = "";
+  
+      selectedClass = classes.find(item => item.slug === this.getAttribute("data-class"));
+      
+      document.querySelector(".character-preview-title").innerText = selectedClass.className;
+      document.querySelector(".character-preview-image").src = `assets/${selectedClass.slug}.webp`;
+      document.querySelector(".character-preview-description").innerHTML = selectedClass.description;
+      Object.keys(selectedClass.stats).forEach(stat => {
+        document.querySelector(".character-preview-stats").innerHTML += `
+          <div class="character-preview-stat">
+            <img src="assets/${STAT_IMG_PATH[stat]}">
+            <p class="stat-value">${selectedClass.stats[stat]}</p>
+            <p class="stat-name">${stat}</p>
+          </div>
+        `;
+      })
     })
-  })
+  });
 
   // Gestione pulsante START
-  document.querySelector("#start-button").addEventListener("click", function() {
+  document.querySelector("#start-btn").addEventListener("click", function() {
     const playerName = document.querySelector("#character-name").value;
-    const playerClass = document.querySelector("#character-class").value;
     
-    if(playerName === "" || playerClass ===  "") {
+    if(playerName === "" || selectedClass === null) {
       Toastify({
         text: "You need a class and a name to play!",
         style: {
@@ -299,25 +314,24 @@ window.addEventListener("load", async function() {
         }
       }).showToast();
     } else {
-      document.querySelector("#your-character").style.display = "none";
-      document.querySelector("#battle").style.display = "flex";
+      document.querySelector(".create-character").style.display = "none";
+      document.querySelector("#game").style.display = "flex";
       document.querySelector("#inventory-container").style.display = "block";
-      player = createCharacter(playerName, playerClass, selectedClass.stats, { weapon: null, armor: null });
+      player = createCharacter(playerName, selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
       renderInventory();
       update();
     }
   })
 
   // Gestione pulsante ATTACK
-  document.querySelector("#attack-button").addEventListener("click", combat);
+  document.querySelector("#attack-btn").addEventListener("click", combat);
 
-  /* DEBUG ONLY */
-  document.querySelector("#your-character").style.display = "none";
-  document.querySelector("#battle").style.display = "flex";
+  /* DEBUG ONLY 
+  document.querySelector(".create-character").style.display = "none";
+  document.querySelector("#game").style.display = "flex";
   document.querySelector("#inventory-container").style.display = "block";
-  playerClass = "Corsaro";
   selectedClass = classes[0];
-  player = createCharacter("Adriano", playerClass, selectedClass.stats, { weapon: null, armor: null });
+  player = createCharacter("Adriano", selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
   renderInventory();
-  update();
+  update();*/
 })
