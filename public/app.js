@@ -310,4 +310,14 @@ window.addEventListener("load", async function() {
 
   // Gestione pulsante ATTACK
   document.querySelector("#attack-button").addEventListener("click", combat);
+
+  /* DEBUG ONLY */
+  document.querySelector("#your-character").style.display = "none";
+  document.querySelector("#battle").style.display = "flex";
+  document.querySelector("#inventory-container").style.display = "block";
+  playerClass = "Corsaro";
+  selectedClass = classes[0];
+  player = createCharacter("Adriano", playerClass, selectedClass.stats, { weapon: null, armor: null });
+  renderInventory();
+  update();
 })
