@@ -1,101 +1,76 @@
 {
   "items": [
     {
-      "name": "Sciabola di Ferro",
-      "type": "weapon",
-      "bonus": {
-        "strength": 4
-      },
-      "cost": 30
-    },
-    {
-      "name": "Pistola a Pietra Focaia",
-      "type": "weapon",
-      "bonus": {
-        "strength": 6
-      },
-      "cost": 50
-    },
-    {
-      "name": "Alabarda da Battaglia",
-      "type": "weapon",
-      "bonus": {
-        "strength": 8
-      },
-      "cost": 80
-    },
-    {
-      "name": "Coltello da Lancio",
+      "name": "Sciabola del Capitano",
       "type": "weapon",
       "bonus": {
         "strength": 3,
         "dexterity": 2
       },
-      "cost": 25
+      "cost": 120
     },
     {
-      "name": "Spada del Capitano",
+      "name": "Pugnale del Corsaro",
       "type": "weapon",
       "bonus": {
-        "strength": 10
+        "dexterity": 4,
+        "luck": 1
       },
-      "cost": 100
+      "cost": 90
     },
     {
-      "name": "Gilet di Cuoio",
+      "name": "Alabarda della Tempesta",
+      "type": "weapon",
+      "bonus": {
+        "strength": 5,
+        "endurance": 1
+      },
+      "cost": 150
+    },
+    {
+      "name": "Archibugio del Bucaniere",
+      "type": "weapon",
+      "bonus": {
+        "dexterity": 3,
+        "luck": 2
+      },
+      "cost": 110
+    },
+    {
+      "name": "Corazza del Capitano",
       "type": "armor",
       "bonus": {
+        "endurance": 4,
+        "strength": 2
+      },
+      "cost": 140
+    },
+    {
+      "name": "Giacca di Pelle del Corsaro",
+      "type": "armor",
+      "bonus": {
+        "dexterity": 3,
         "endurance": 2
       },
-      "cost": 20
-    },
-    {
-      "name": "Giubbotto Imbottito",
-      "type": "armor",
-      "bonus": {
-        "endurance": 3
-      },
-      "cost": 35
-    },
-    {
-      "name": "Corazza di Ferro",
-      "type": "armor",
-      "bonus": {
-        "endurance": 5
-      },
-      "cost": 50
-    },
-    {
-      "name": "Giacca del Capitano",
-      "type": "armor",
-      "bonus": {
-        "endurance": 6
-      },
-      "cost": 80
-    },
-    {
-      "name": "Armatura Completa",
-      "type": "armor",
-      "bonus": {
-        "endurance": 8
-      },
       "cost": 100
     },
     {
-      "name": "Pozione Curativa",
-      "type": "health",
+      "name": "Scudo del Guardiamarina",
+      "type": "armor",
       "bonus": {
-        "health": 30
+        "endurance": 5,
+        "luck": 1
       },
-      "cost": 15
+      "cost": 130
     },
     {
-      "name": "Pozione di Forza",
-      "type": "health",
+      "name": "Elmo del Pirata",
+      "type": "armor",
       "bonus": {
-        "strength": 5
+        "endurance": 3,
+        "strength": 1
       },
-      "cost": 20
+      "cost": 80
     },
     {
       "name": "Pozione di Resistenza",
@@ -103,9 +78,33 @@
       "bonus": {
         "endurance": 5
       },
-      "cost": 20
+      "cost": 70
+    },
+    {
+      "name": "Pozione di Destrezza",
+      "type": "health",
+      "bonus": {
+        "dexterity": 5
+      },
+      "cost": 75
+    },
+    {
+      "name": "Pozione della Fortuna",
+      "type": "health",
+      "bonus": {
+        "luck": 4
+      },
+      "cost": 50
+    },
+    {
+      "name": "Pozione di Forza",
+      "type": "health",
+      "bonus": {
+        "strength": 4
+      },
+      "cost": 60
     }
-  ],
+  ],  
   "classes": [
     {
       "className": "Corsaro",
@@ -125,7 +124,7 @@
       "slug": "sciamano",
       "description": "Un mistico legato agli spiriti del mare e alle forze oceaniche. Lo Sciamano del Mare usa antichi poteri e incantesimi per controllare le acque, evocare creature marine o proteggere l'equipaggio dalle tempeste e dalle maledizioni.",
       "stats": {
-        "strength": 8,
+        "strength": 10,
         "dexterity": 10,
         "endurance": 12,
         "luck": 14,

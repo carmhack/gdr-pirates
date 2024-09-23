@@ -29,12 +29,13 @@ async function getEntity(entity) {
   }
 }
 
-function createCharacter(name, className, stats, equipment, bonus = 0) {
+function createCharacter({ name, className, stats, equipment, bonus = 0 }) {
   return {
     name,
     className,
     stats,
     equipment,
+    bonus,
     calculateHitChance(target) {
       const baseHitChance = 50;  // Base % di probabilità di colpire
       const dexterityBonus = this.stats.dexterity * 2; // La destrezza aggiunge precisione
@@ -49,7 +50,7 @@ function createCharacter(name, className, stats, equipment, bonus = 0) {
       if (hitRoll < hitChance) {
         // Colpo riuscito
         let baseDamage = this.stats.strength;  // Danno basato sulla forza
-        const weaponBonus = bonus;
+        const weaponBonus = this.bonus;
         const criticalChance = this.stats.luck;  // Usa la fortuna per determinare i critici
         const criticalRoll = Math.random() * 100;
         
@@ -70,6 +71,81 @@ function createCharacter(name, className, stats, equipment, bonus = 0) {
   }
 }
 
+function createPirateCharacter(type) {
+  function createCorsaro() {
+    return {
+      name: "Sgherro",
+      className: "Corsaro",
+      stats: {
+        strength: 5,
+        dexterity: 5,
+        endurance: 5,
+        luck: 5,
+        health: 50,
+        gold: 50,
+      },
+      equipment: {
+        weapon: "Pugnale",
+        armor: "",
+      },
+      bonus: 1,
+    };
+  }
+
+  function createAssassino() {
+    return {
+      name: "Grimjaw",
+      className: "Assassino del Porto",
+      stats: {
+        strength: 10,
+        dexterity: 12,
+        endurance: 10,
+        luck: 8,
+        health: 100,
+        gold: 150,
+      },
+      equipment: {
+        weapon: "Sciabola",
+        armor: "Leggera",
+      },
+      bonus: 3,
+    };
+  }
+
+  function createMastroArmi() {
+    return {
+      name: "Barbarossa",
+      className: "Mastro d'Armi",
+      stats: {
+        strength: 15,
+        dexterity: 14,
+        endurance: 12,
+        luck: 12,
+        health: 100,
+        gold: 300,
+      },
+      equipment: {
+        weapon: "Alabarda",
+        armor: "Media",
+      },
+      bonus: 5,
+    };
+  }
+
+  // Mappa dei tipi alle funzioni di creazione
+  const characterCreators = {
+    corsaro: createCorsaro,
+    assassino: createAssassino,
+    mastro: createMastroArmi,
+  }
+
+  const character = characterCreators[type]();
+
+  return {
+    ...createCharacter(character)
+  }
+}
+
 /* Game data */
 let DEFAULT_INCREMENT = 2;
 let HEALTH_INCREMENT = 20;
@@ -80,39 +156,9 @@ let selectedClass = null;
 let currentLevel = 0;
 let currentShopFilter = "all";
 const enemies = [
-  createCharacter("Sgherro", "Corsaro", {
-    strength: 5,
-    dexterity: 5,
-    endurance: 5,
-    luck: 5,
-    health: 50,
-    gold: 50,
-  }, {
-    weapon: "Pugnale",
-    armor: "",
-  }, 1),
-  createCharacter("Grimjaw", "Assassino del Porto", {
-    strength: 10,
-    dexterity: 12,
-    endurance: 10,
-    luck: 8,
-    health: 100,
-    gold: 150,
-  }, {
-    weapon: "Sciabola",
-    armor: "Leggera",
-  }, 3),
-  createCharacter("Barbarossa", "Mastro d'Armi", {
-    strength: 15,
-    dexterity: 14,
-    endurance: 12,
-    luck: 12,
-    health: 100,
-    gold: 300,
-  }, {
-    weapon: "Alabarda",
-    armor: "Media",
-  }, 5),
+  createPirateCharacter("corsaro"),
+  createPirateCharacter("assassino"),
+  createPirateCharacter("mastro"),
 ];
 
 /** Funzioni di Rendering */
@@ -284,7 +330,7 @@ function update() {
 }
 
 /** Main function */
-window.addEventListener("load", async function() {
+document.addEventListener("DOMContentLoaded", async function() {
   // API per ottenere items e classi personaggi
   items = await getEntity("items");
   classes = await getEntity("classes");
@@ -336,7 +382,12 @@ window.addEventListener("load", async function() {
       document.querySelector(".create-character").style.display = "none";
       document.querySelector(".game").style.display = "flex";
       document.querySelector(".shop").style.display = "block";
-      player = createCharacter(playerName, selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
+      player = createCharacter({
+        name: playerName,
+        className: selectedClass.className,
+        stats: selectedClass.stats,
+        equipment: { weapon: null, armor: null }
+      });
       renderShop();
       update();
     }
@@ -345,12 +396,12 @@ window.addEventListener("load", async function() {
   // Gestione pulsante ATTACK
   document.querySelector("#attack-btn").addEventListener("click", combat);
 
-  /* DEBUG ONLY */
+  /* DEBUG ONLY 
   document.querySelector(".create-character").style.display = "none";
   document.querySelector(".game").style.display = "flex";
   document.querySelector(".shop").style.display = "block";
   selectedClass = classes[0];
   player = createCharacter("Adriano", selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
   renderShop();
-  update();
+  update();*/
 })
