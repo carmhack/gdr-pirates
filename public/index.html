@@ -29,7 +29,7 @@
         <button class="start-btn" type="button" id="start-btn">Let's go!</button>
       </section>
 
-      <section id="game">
+      <section class="game">
         <div class="player-info">
           <img id="player-image" class="info-image">
           <p id="player-name" class="info-name"></p>
@@ -49,15 +49,15 @@
         </div>
       </section>
 
-      <section id="inventory-container" class="inventory-container">
-        <h2>Pirate Shop</h2>
-        <div class="inventory-filters">
-          <button class="inventory-filter" data-filter="all">All</button>
-          <button class="inventory-filter" data-filter="weapon">Weapon</button>
-          <button class="inventory-filter" data-filter="armor">Armor</button>
-          <button class="inventory-filter" data-filter="potion">Potion</button>
+      <section class="shop">
+        <img src="assets/shop_nobg.png" alt="Shop">
+        <div class="shop-filters">
+          <button class="shop-filter" data-filter="all">All</button>
+          <button class="shop-filter" data-filter="weapon">Weapon</button>
+          <button class="shop-filter" data-filter="armor">Armor</button>
+          <button class="shop-filter" data-filter="health">Potion</button>
         </div>
-        <div id="inventory"></div>
+        <div id="shop-items"></div>
       </section>
     </main>
   </div>

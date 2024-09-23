@@ -19,11 +19,16 @@ body {
 
 #app {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   padding: 2rem;
   color: var(--text-color);
   background-color: var(--bg-color);
   overflow-y: scroll;
+}
+
+header {
+  text-align: center;
+  font-size: 2.4rem;
 }
 
 button {
@@ -126,7 +131,7 @@ button {
   }
 }
 
-#game {
+.game {
   display: none;
   justify-content: space-between;
   gap: 6px;
@@ -138,11 +143,11 @@ button {
 
   .player-info {
     .info-image {
-      width: 300px;
+      width: 100%;
     }
 
     .info-name {
-      height: 100px;
+      height: 70px;
       font-size: 2rem;
       font-weight: 700;
     }
@@ -155,27 +160,15 @@ button {
       text-align: left;
     }
 
-    #player-stats li, #player-inventory li {
-      justify-content: flex-start;
-      flex-direction: row-reverse;
-
-      * {
-        margin: 0 6px;
-      }
-    }
-
     .list {
       margin-top: 10px;
       list-style: none;
   
       li {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: flex-start;
         margin-bottom: 10px;
-  
-        * {
-          margin: 0 6px;
-        }
   
         .stat-icon {
           width: 60px;
@@ -189,6 +182,7 @@ button {
         }
   
         progress {
+          width: 100%;
           font-size: 1.4rem;
           font-weight: 300;
           appearance: none;
@@ -211,6 +205,10 @@ button {
     .battle-inventory {
       margin-top: 20px;
     }
+  }
+
+  .player-info:first-child {
+    text-align: right;
   }
   
   .game-info {
@@ -251,10 +249,23 @@ button {
   }
 }
 
-.inventory-container {
+.shop {
   display: none;
   margin-top: 60px;
   text-align: center;
+
+  img {
+    width: 250px;
+  }
+
+  .shop-filters {
+    .shop-filter {
+      margin: 0 6px;
+      background-color: #F97F51;
+      color: #222;
+      border-bottom: 5px solid #55E6C1;
+    }
+  }
 
   h2 {
     padding: 6px 12px;
@@ -264,7 +275,7 @@ button {
     color: #fff;
   }
 
-  #inventory {
+  #shop-items {
     margin-top: 60px;
     display: flex;
     flex-wrap: wrap;
@@ -301,15 +312,11 @@ button {
       }
 
       .item-buy-button {
-        padding: 6px;
+        padding: 6px 12px;
         font-size: .8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        background-color: #472727;
-        color: #fff;
-        border: 0;
-        border-radius: 4px;
-        cursor: pointer;
+        background-color: #F97F51;
+        color: #222;
+        border-bottom: 3px solid #55E6C1;
       }
     }
   }

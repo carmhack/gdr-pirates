@@ -78,6 +78,7 @@ let classes = [];
 let player = null;
 let selectedClass = null;
 let currentLevel = 0;
+let currentShopFilter = "all";
 const enemies = [
   createCharacter("Sgherro", "Corsaro", {
     strength: 5,
@@ -170,28 +171,46 @@ function renderEnemyInfo() {
   renderBattleInventory(enemy, "#enemy-inventory");
 }
 
-function renderInventory() {
-  document.querySelectorAll(".item-buy-button").forEach(button => {
-    button.removeEventListener("click", buyItem);
-  });
-  document.querySelector("#inventory").innerHTML = "";
-  items.forEach(({ name, type, bonus, cost }) => {
-    let bonusText = "";
-    Object.keys(bonus).forEach(effect => {
-      bonusText += `${effect}: +${bonus[effect]}\n`;
+function renderShop() {
+  function _renderShopItems(currentShopFilter) {
+    document.querySelectorAll(".item-buy-button").forEach(button => {
+      button.removeEventListener("click", buyItem);
+    });
+    document.querySelector("#shop-items").innerHTML = "";
+    items.forEach(({ name, type, bonus, cost }) => {
+      if (currentShopFilter === "all" || currentShopFilter === type) {
+        let bonusText = "";
+        Object.keys(bonus).forEach(effect => {
+          bonusText += `${effect}: +${bonus[effect]}\n`;
+        })
+        document.querySelector("#shop-items").innerHTML += `
+          <div class="item">
+            <img src="assets/${type}.webp" />
+            <p class="item-cost">$${cost} <button data-item="${name}" class="item-buy-button">Buy!</button></p>
+            <p class="item-name">${name}</p>
+            <p class="item-effect">${bonusText}</p>
+          </div>
+        `;
+      }
+    });
+    document.querySelectorAll(".item-buy-button").forEach(button => {
+      button.addEventListener("click", buyItem);
+    });
+  }
+  
+  function _handleShopFilter() {
+    const filters = document.querySelectorAll(".shop-filter");
+    filters.forEach(filter => {
+      filter.addEventListener("click", function() {
+        const dataFilter = this.getAttribute("data-filter");
+        currentShopFilter = dataFilter;
+        _renderShopItems(currentShopFilter);
+      })
     })
-    document.querySelector("#inventory").innerHTML += `
-      <div class="item">
-        <img src="assets/${type}.webp" />
-        <p class="item-cost">$${cost} <button data-item="${name}" class="item-buy-button">Buy!</button></p>
-        <p class="item-name">${name}</p>
-        <p class="item-effect">${bonusText}</p>
-      </div>
-    `;
-  });
-  document.querySelectorAll(".item-buy-button").forEach(button => {
-    button.addEventListener("click", buyItem);
-  });
+  }
+
+  _handleShopFilter();
+  _renderShopItems(currentShopFilter);
 }
 
 /** Funzioni di Gioco */
@@ -205,7 +224,7 @@ function combat() {
   enemy.attack(player);
 
   if (enemy.stats.health < enemyHealthBeforeAttack) {
-    renderGameLog(`${player.name} subisce un attacco: la sua salute scende a ${enemy.stats.health}`);
+    renderGameLog(`${enemy.name} subisce un attacco: la sua salute scende a ${enemy.stats.health}`);
   } else {
     renderGameLog(`${player.name} ha mancato l'attacco!`);
   }
@@ -315,10 +334,10 @@ window.addEventListener("load", async function() {
       }).showToast();
     } else {
       document.querySelector(".create-character").style.display = "none";
-      document.querySelector("#game").style.display = "flex";
-      document.querySelector("#inventory-container").style.display = "block";
+      document.querySelector(".game").style.display = "flex";
+      document.querySelector(".shop").style.display = "block";
       player = createCharacter(playerName, selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
-      renderInventory();
+      renderShop();
       update();
     }
   })
@@ -326,12 +345,12 @@ window.addEventListener("load", async function() {
   // Gestione pulsante ATTACK
   document.querySelector("#attack-btn").addEventListener("click", combat);
 
-  /* DEBUG ONLY 
+  /* DEBUG ONLY */
   document.querySelector(".create-character").style.display = "none";
-  document.querySelector("#game").style.display = "flex";
-  document.querySelector("#inventory-container").style.display = "block";
+  document.querySelector(".game").style.display = "flex";
+  document.querySelector(".shop").style.display = "block";
   selectedClass = classes[0];
   player = createCharacter("Adriano", selectedClass.className, selectedClass.stats, { weapon: null, armor: null });
-  renderInventory();
-  update();*/
+  renderShop();
+  update();
 })
